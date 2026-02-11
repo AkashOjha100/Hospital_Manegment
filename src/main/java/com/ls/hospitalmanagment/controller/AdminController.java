@@ -23,7 +23,7 @@ public class AdminController {
     @GetMapping("/patient")
     public ResponseEntity<List<PatientResponseDto>> getAllPatients(
             @RequestParam(value = "page", defaultValue = "0") Integer pageNumber,
-            @RequestParam(value = "size", defaultValue = "0") Integer pageSize
+            @RequestParam(value = "size", defaultValue = "10") Integer pageSize
     ){
         return ResponseEntity.ok(patientService.getAllPatients(pageNumber, pageSize));
     }

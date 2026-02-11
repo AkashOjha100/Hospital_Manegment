@@ -26,18 +26,31 @@ public class JwtAuthFillter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+        if (path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/webjars") ||
+                path.startsWith("/error")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
         try {
             log.info("incoming request: {}", request.getRequestURI());
 
             final String requestTokenHeader = request.getHeader("Authorization");
 
-            if (requestTokenHeader == null || requestTokenHeader.startsWith("Bearer")) {
+            if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            String token = requestTokenHeader.split("Bearer")[1];//Bearer frgrgtggkgfieufoehfhfohhoh
+            String token = requestTokenHeader.split("Bearer ")[1];//Bearer frgrgtggkgfieufoehfhfohhoh
             String username = authUtil.getUsernameFromToken(token);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -46,6 +59,7 @@ public class JwtAuthFillter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(app_token);
             }
+
             filterChain.doFilter(request, response);
         }
         catch(Exception e){

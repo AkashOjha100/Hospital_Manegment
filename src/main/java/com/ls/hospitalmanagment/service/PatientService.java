@@ -31,7 +31,8 @@ public class PatientService {
     }
 
     public List<PatientResponseDto> getAllPatients(Integer pageNumber, Integer pageSize) {
-        return patientRepository.findAllPatients(PageRequest.of(pageNumber, pageSize))
+        return patientRepository
+                .findAllPatients(PageRequest.of(pageNumber, pageSize))
                 .stream()
                 .map(patient -> modelMapper.map(patient, PatientResponseDto.class))
                 .collect(Collectors.toList());
